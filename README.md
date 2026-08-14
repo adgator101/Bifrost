@@ -1,1 +1,1 @@
-Trying to bring idea to life.
+#### Hiemdall is busy right now. Bifrost is closed.
