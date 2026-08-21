@@ -1,15 +1,21 @@
 {
-  "name": "bifrost",
-  "private": true,
-  "engines": {
-    "node": ">=18",
-    "pnpm": ">=8"
-  },
-   "scripts": {
-    "dev:api": "pnpm --filter @bifrost/api start:dev",
-    "dev:web": "pnpm --filter @bifrost/web dev",
-    "db:migrate": "pnpm --filter @bifrost/database db:migrate",
-    "db:generate": "pnpm --filter @bifrost/database db:generate",
-    "db:studio": "pnpm --filter @bifrost/database db:studio"
-  }
+	"name": "bifrost",
+	"private": true,
+	"engines": {
+		"node": ">=18",
+		"pnpm": ">=8"
+	},
+	"scripts": {
+		"dev:api": "pnpm --filter @bifrost/api start:dev",
+		"dev:web": "pnpm --filter @bifrost/web dev",
+		"db:migrate": "pnpm --filter @bifrost/database db:migrate",
+		"db:generate": "pnpm --filter @bifrost/database db:generate",
+		"db:studio": "pnpm --filter @bifrost/database db:studio",
+		"lint": "biome lint .",
+		"format": "biome format --write .",
+		"check": "biome check --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.9"
+	}
 }
