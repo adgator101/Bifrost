@@ -4,6 +4,7 @@ import {
 	IsEmail,
 	IsEnum,
 	IsString,
+	IsStrongPassword,
 	MaxLength,
 	MinLength,
 } from 'class-validator';
@@ -23,10 +24,19 @@ export class RegisterDto {
 		maxLength: 25,
 	})
 	@IsString()
-	@MinLength(8, {
-		message: 'Password must be at least 8 characters long',
-	})
-	@MaxLength(25, { message: 'Password too long' })
+	@IsStrongPassword(
+		{
+			minLength: 8,
+			minNumbers: 1,
+			minLowercase: 1,
+			minUppercase: 1,
+			minSymbols: 1,
+		},
+		{
+			message:
+				'Password is too weak. Use atleast 1 Symbols, Numbers and Lower Case Alphabets',
+		},
+	)
 	password!: string;
 
 	@ApiProperty({
@@ -67,4 +77,3 @@ export class RegisterDto {
 	@IsString()
 	providerId!: string;
 }
-
