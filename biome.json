@@ -31,7 +31,8 @@
 		"rules": {
 			"preset": "recommended",
 			"style": {
-				"noNonNullAssertion": "off"
+				"noNonNullAssertion": "off",
+				"useImportType": "off"
 			},
 			"suspicious": {
 				"noExplicitAny": "off"
