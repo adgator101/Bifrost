@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
+import { JwtPayload } from 'src/common/interfaces/jwt.interface.js';
 import { IS_PUBLIC_KEY } from '../common/decorators/public.decorator.js';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AuthGuard implements CanActivate {
 		private reflector: Reflector,
 	) {}
 
-	canActivate(context: ExecutionContext) {
+	async canActivate(context: ExecutionContext) {
 		const isPublicEndpoint = this.reflector.getAllAndOverride<boolean>(
 			IS_PUBLIC_KEY,
 			[context.getHandler(), context.getClass()],
@@ -35,10 +36,12 @@ export class AuthGuard implements CanActivate {
 		}
 
 		try {
-			const payload = this.jwtService.verifyAsync(token);
+			const payload: JwtPayload = await this.jwtService.verifyAsync(token);
 			request['user'] = payload;
 		} catch (error) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException(
+				'Invalid or expired authentication token',
+			);
 		}
 		return true;
 	}
