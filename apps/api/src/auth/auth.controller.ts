@@ -1,8 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Req, Request } from '@nestjs/common';
+import {
+	ApiBearerAuth,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
+import type { JwtPayload } from 'src/common/interfaces/jwt.interface.js';
 import { Public } from '../common/decorators/public.decorator.js';
 import { AuthService } from './auth.service.js';
-import { LoginDto } from './dto/auth/login.dto.ts';
+import { LoginDto } from './dto/auth/login.dto.js';
+import { RefreshTokenDto } from './dto/auth/refresh-token.dto.js';
 import { RegisterDto } from './dto/auth/register.dto.js';
 
 @ApiTags('Auth')
@@ -25,7 +32,21 @@ export class AuthController {
 		return this.authService.register(dto);
 	}
 
+	@Public()
+	@Post('login')
 	async login(@Body() dto: LoginDto) {
 		return this.authService.login(dto);
+	}
+
+	@ApiBearerAuth()
+	@Get('me')
+	async getProfile(@Req() request: Request) {
+		const userData: JwtPayload = request['user'];
+		return this.authService.getUserProfile(userData.email);
+	}
+
+	@Post('refresh')
+	async issueAccessToken(@Body() dto: RefreshTokenDto) {
+		return this.authService.refreshTokens(dto.refreshToken);
 	}
 }

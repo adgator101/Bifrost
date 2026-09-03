@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD, Reflector } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service.js';
+import { SessionService } from 'src/session/session.service.js';
 import { PrismaService } from '../../prisma/prisma.service.ts';
+import { UserService } from '../user/user.service.js';
 import { AuthController } from './auth.controller.js';
 import { AuthGuard } from './auth.guard.js';
 import { AuthService } from './auth.service.js';
@@ -20,6 +21,7 @@ import { AuthService } from './auth.service.js';
 		},
 
 		UserService,
+		SessionService,
 	],
 	imports: [
 		JwtModule.registerAsync({
