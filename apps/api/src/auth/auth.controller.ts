@@ -49,4 +49,22 @@ export class AuthController {
 	async issueAccessToken(@Body() dto: RefreshTokenDto) {
 		return this.authService.refreshTokens(dto.refreshToken);
 	}
+
+	@Post('logout')
+	async logout(@Body() dto: RefreshTokenDto) {
+		await this.authService.logout(dto.refreshToken);
+
+		return {
+			message: 'Logged out successfully',
+		};
+	}
+
+	@Post('logout/all')
+	async logoutAll(@Body() dto: RefreshTokenDto) {
+		await this.authService.logoutAll(dto.refreshToken);
+
+		return {
+			message: 'Logged out successfully',
+		};
+	}
 }

@@ -8,6 +8,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { compareData, hashPassword } from 'src/common/utils/crypto.util.js';
 import { SessionService } from 'src/session/session.service.js';
+import { TokenService } from 'src/token/token.service.js';
 import { PrismaService } from '../../prisma/prisma.service.ts';
 import { UserService } from '../user/user.service.js';
 import { LoginDto } from './dto/auth/login.dto.ts';
@@ -19,20 +20,16 @@ export class AuthService {
 		private readonly prisma: PrismaService,
 		private readonly userService: UserService,
 		private readonly sessionService: SessionService,
+		private readonly tokenService: TokenService,
 	) {}
 
 	async register(dto: RegisterDto) {
 		try {
 			return await this.prisma.$transaction(async (tx) => {
-				const hashedPassword = await hashPassword(dto.password);
+				// TODO: Check exception handling
+				const user = await this.userService.createUser(tx, dto);
 
-				const user = await tx.user.create({
-					data: {
-						email: dto.email,
-						firstName: dto.firstName,
-						lastName: dto.lastName,
-					},
-				});
+				const hashedPassword = await hashPassword(dto.password);
 
 				const providerId = dto.provider === 'LOCAL' ? null : dto.providerId;
 
@@ -56,12 +53,6 @@ export class AuthService {
 				};
 			});
 		} catch (error) {
-			if (error instanceof Prisma.PrismaClientKnownRequestError) {
-				if (error.code === 'P2002') {
-					throw new ConflictException('User with this email already exists');
-				}
-			}
-
 			console.error('Registration error:', error);
 			throw new InternalServerErrorException(
 				'An unexpected error occurred during registration',
@@ -122,8 +113,7 @@ export class AuthService {
 	}
 
 	async refreshTokens(rawRefreshToken: string) {
-		const payload =
-			await this.sessionService.verifyRefreshToken(rawRefreshToken);
+		const payload = await this.tokenService.verifyRefreshToken(rawRefreshToken);
 
 		const session = await this.prisma.session.findUnique({
 			where: { id: payload.sessionId },
@@ -161,5 +151,29 @@ export class AuthService {
 			payload.sub,
 			payload.email,
 		);
+	}
+
+	async logout(rawRefreshToken: string) {
+		const payload = await this.tokenService.verifyRefreshToken(rawRefreshToken);
+
+		const session = await this.prisma.session.findUnique({
+			where: {
+				id: payload.sessionId,
+			},
+		});
+
+		if (!session) {
+			throw new UnauthorizedException('Session not found');
+		}
+
+		if (!session.revokedAt) {
+			await this.sessionService.revokeSession(payload.sessionId);
+		}
+	}
+
+	async logoutAll(rawRefreshToken: string) {
+		const payload = await this.tokenService.verifyRefreshToken(rawRefreshToken);
+
+		await this.sessionService.revokeAllUserSessions(payload.sub);
 	}
 }
