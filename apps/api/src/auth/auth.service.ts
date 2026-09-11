@@ -1,15 +1,14 @@
-import { Prisma } from '@bifrost/database';
+import { AuthResponse } from '@bifrost/contracts';
 import {
-	ConflictException,
 	Injectable,
 	InternalServerErrorException,
 	UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { compareData, hashPassword } from 'src/common/utils/crypto.util.js';
-import { SessionService } from 'src/session/session.service.js';
-import { TokenService } from 'src/token/token.service.js';
 import { PrismaService } from '../../prisma/prisma.service.ts';
+import { compareData, hashPassword } from '../common/utils/crypto.util.js';
+import { SessionService } from '../session/session.service.js';
+import { TokenService } from '../token/token.service.js';
 import { UserService } from '../user/user.service.js';
 import { LoginDto } from './dto/auth/login.dto.ts';
 import type { RegisterDto } from './dto/auth/register.dto.js';
@@ -23,7 +22,7 @@ export class AuthService {
 		private readonly tokenService: TokenService,
 	) {}
 
-	async register(dto: RegisterDto) {
+	async register(dto: RegisterDto): Promise<AuthResponse> {
 		try {
 			return await this.prisma.$transaction(async (tx) => {
 				// TODO: Check exception handling
@@ -60,7 +59,7 @@ export class AuthService {
 		}
 	}
 
-	async login(dto: LoginDto) {
+	async login(dto: LoginDto): Promise<AuthResponse> {
 		const existingUser = await this.userService.findUserByEmail(dto.email);
 
 		if (!existingUser) {

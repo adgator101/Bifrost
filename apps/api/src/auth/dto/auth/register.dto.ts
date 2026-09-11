@@ -1,3 +1,5 @@
+import { RegisterRequest } from '@bifrost/contracts';
+// TODO: Remove this later
 import { Provider } from '@bifrost/database';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -9,7 +11,7 @@ import {
 	MinLength,
 } from 'class-validator';
 
-export class RegisterDto {
+export class RegisterDto implements RegisterRequest {
 	@ApiProperty({
 		description: 'User email address',
 		example: 'user@example.com',

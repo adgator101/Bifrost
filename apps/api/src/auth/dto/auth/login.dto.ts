@@ -1,7 +1,8 @@
+import { LoginRequest } from '@bifrost/contracts';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 
-export class LoginDto {
+export class LoginDto implements LoginRequest {
 	@ApiProperty({
 		description: 'User email address',
 		example: 'user@example.com',
