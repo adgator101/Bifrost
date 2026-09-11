@@ -20,6 +20,6 @@ import { UserModule } from './user/user.module.js';
 		TokenModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, TokenService],
+	providers: [AppService],
 })
 export class AppModule {}
